@@ -34,10 +34,11 @@ def loadGrub():
             e = entry
             for i in range(0, level):
                 childnum = e['childnum']
-                e = e['child'][childnum]
+                e = e['child'][childnum-1]
 
-            print e['name']
-            print e['childnum']
+            if e['childnum']=={}:
+                e['childnum'] = 0
+
             childnum = e['childnum']
             e['child'][childnum]['name'] = r[0][1]
             e['child'][childnum]['childnum'] = 0
@@ -55,15 +56,12 @@ def loadGrub():
         r = re.findall(r'^\s*}', eachLine)
         if r:
             level -= 1
-               
-                #print "%s%s %s"%(r[0][0], r[0][1])
     
-    print(json.dumps(entry))
+    #print(json.dumps(entry))
     f.close()
 
 def printGrub(e, level):
-    #print(" "*(4*(level-1))+e['name'])
-    print(e['name'])
+    print(" "*(4*level)+e['name'])
     if e['type']=='submenu':
         for i in range(0, e['childnum']):
             printGrub(e['child'][i], level+1)
