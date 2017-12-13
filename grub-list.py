@@ -73,7 +73,7 @@ def printEntry(root, p, l):
     for i in range(0, root['childnum']):
         if i == p[l]:
             print(" "*(4*l-1)+"+"+root['child'][i]['name'])
-            if root['child'][i]['type'] == "submenu":
+            if root['child'][i]['type'] == "submenu" and l+1<len(p):
                 printEntry(root['child'][i], p, l+1)
         else:
             print(" "*(4*l)+root['child'][i]['name'])
@@ -140,7 +140,6 @@ getch = _Getch()
 " any key else:                     0   "
 def getKeyInput():
     c = getch()
-
     if ord(c)==27:
         c = getch()
         if ord(c) != 91:
@@ -173,6 +172,7 @@ def menu():
     while True:
         os.system("clear")
         printEntry(entry, path, 0)
+        k=0
         while k==0:
             k = getKeyInput()
 
