@@ -7,6 +7,21 @@ import re
 import json
 from collections import defaultdict
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    INVERSE = '\033[7m'
+    UNDERLINE = '\033[4m'
+
+class tags:
+    SUBENTRY = "["+bcolors.FAIL+"+" +bcolors.ENDC+"] "
+    ENTRY = "["+bcolors.OKGREEN+"●" +bcolors.ENDC+"] "
+
 def tree():
     return defaultdict(tree)
 
@@ -56,7 +71,6 @@ def loadGrub():
         if r:
             level -= 1
     
-    #print(json.dumps(entry))
     f.close()
 
 def printGrub(e, level):
@@ -72,11 +86,25 @@ def showGrub():
 def printEntry(root, p, l):
     for i in range(0, root['childnum']):
         if i == p[l]:
-            print(" "*(4*l-1)+"+"+root['child'][i]['name'])
-            if root['child'][i]['type'] == "submenu" and l+1<len(p):
-                printEntry(root['child'][i], p, l+1)
+            if root['child'][i]['type'] == "submenu":
+                print(" "*(4*l) + tags.SUBENTRY + \
+                        bcolors.INVERSE + \
+                        root['child'][i]['name'] + \
+                        bcolors.ENDC)
+                if l+1<len(p):
+                    printEntry(root['child'][i], p, l+1)
+            else:
+                print(" "*(4*l) + tags.ENTRY + \
+                        bcolors.INVERSE + \
+                        root['child'][i]['name'] + \
+                        bcolors.ENDC)
         else:
-            print(" "*(4*l)+root['child'][i]['name'])
+            if root['child'][i]['type'] == "submenu":
+                print(" "*(4*l) + tags.SUBENTRY + \
+                        root['child'][i]['name'])
+            else:
+                print(" "*(4*l) + tags.ENTRY + \
+                        root['child'][i]['name'])
 
 def getEntry(root, p):
     e = root
@@ -85,8 +113,53 @@ def getEntry(root, p):
         e = e['child'][idx]
     return e
 
-def setEntry(path):
+def checkDefault():
+    # Check "/etc/default/grub" GRUB_DEFAULT=saved
     return
+
+def reboot():
+    while True:
+        answer = raw_input(bcolors.BOLD + \
+                "Reboot now? [y/n]" + \
+                bcolors.ENDC )
+        if answer=="y" or answer=="Y" or answer=="yes":
+            os.system("sudo reboot")
+            return
+        elif answer=="n" or answer=="N" or answer=="no":
+            return
+        else:
+            continue
+
+def setEntry(path):
+    global entry
+    checkDefault()
+    p_str = ""
+    for i in range(0,len(path)-1):
+        p_str += str(path[i])
+        p_str += ">"
+    p_str += str(path[len(path)-1])
+
+    cmd = "sudo grub-reboot " + "\"" + p_str + "\""
+    
+    while True:
+        answer = raw_input(bcolors.BOLD + \
+                "Change the Selected Entry? [y/n]" + \
+                bcolors.ENDC )
+        if answer=="y" or answer=="Y" or answer=="yes":
+            os.system(cmd)
+            reboot()
+            print bcolors.OKGREEN + \
+                    "Grub Entry has changed to:" + \
+                    bcolors.ENDC
+            print bcolors.BOLD + \
+                    getEntry(entry, path)['name'] + \
+                    bcolors.ENDC
+            return 1
+        elif answer=="n" or answer=="N" or answer=="no":
+            return 0
+        else:
+            continue
+    
 
 " ====================  Implement Python getch()  =========================="
 """Gets a single character from standard input.  Does not echo to the screen."""
@@ -176,28 +249,30 @@ def menu():
         while k==0:
             k = getKeyInput()
 
-        if k==1:            # Up
+        if k==1:                    # Up
             p = path.pop()
             p = max(0, p-1)
             path.append(p)
             continue
-        if k==2:            # Down
+        if k==2:                    # Down
             p = path.pop()
             p = min(getEntry(entry, path)['childnum']-1, p+1)
             path.append(p)
             continue
-        if k==3:            # Right
+        if k==3 or k==5:            # Right & Enter
             if getEntry(entry, path)['type']=='submenu':
                 path.append(0)
                 continue
             else:
-                setEntry(path)
-                break
-        if k==4:            # Left
-            if getEntry(entry, path)['type']=='submenu':
+                if setEntry(path)==0:
+                    continue
+                else:
+                    break
+        if k==4:                    # Left
+            if len(path)>1:
                 path.pop()
             continue
-        if k==6:
+        if k==6:                    # q
             break
 
 def main():
