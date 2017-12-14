@@ -154,12 +154,16 @@ def setEntry(path):
     print ""
     if not checkDefault():
         print bcolors.WARNING + \
-                "Please change the following setting in \etc\default\grub:" + \
+                "Please change the following setting in " + bcolors.ENDC + \
+                bcolors.BOLD + "\etc\default\grub:" + \
                 bcolors.ENDC
         print ""
         print bcolors.BOLD + "GRUB_DEFAULT" + bcolors.ENDC +\
                 " = " + \
                 bcolors.OKGREEN + "saved" + bcolors.ENDC
+        print ""
+        print "And then " + \
+                bcolors.BOLD + "sudo update-grub" + bcolors.ENDC
         return 1
 
     p_str = ""
