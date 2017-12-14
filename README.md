@@ -6,13 +6,13 @@
 
 #### file include:
 
-* grublist.py
+* grub-list.py
 
 #### usage:
 
 execute the ```grublist.py```.
 
-**[Up]** **[Down]** **[Left]** **[Right]** can be used to select entry or back to the up one level.
+**[↑]** **[↓]** **[←]** **[→]** can be used to select entry or back to the up one level.
 
 **[Enter]** is the same function with **[RIGHT]**
 

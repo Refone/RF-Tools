@@ -36,7 +36,7 @@ def loadGrub():
     try:
         f = open('/boot/grub/grub.cfg', 'r')
     except IOError:
-        print "Open file \"/boot/grub/grub.cfg\" Failed."
+        print "LoadGrub Failed.\"/boot/grub/grub.cfg\" Not Found."
         return
 
     entry['name']='root'
@@ -115,14 +115,29 @@ def getEntry(root, p):
 
 def checkDefault():
     # Check "/etc/default/grub" GRUB_DEFAULT=saved
-    return
+    # OK: return 1; NOOK: return 0.
+    try:
+        f = open('/etc/default/grub', 'r')
+    except IOError:
+        print "CheckDefault Failed.\"/etc/default/grub\" Not Found."
+        return 0
+
+    for eachLine in f.readlines():
+        r = re.findall(r'^\s*GRUB_DEFAULT\s*=\s*[\'\"]?(\w+)[\'\"]?', eachLine)
+        if r:
+            if r[0]=='saved':
+                return 1
+            else:
+                return 0
+
+    return 0
 
 def reboot():
     while True:
         answer = raw_input(bcolors.BOLD + \
-                "Reboot now? [y/n]" + \
+                "Reboot now? [Y/n]" + \
                 bcolors.ENDC )
-        if answer=="y" or answer=="Y" or answer=="yes":
+        if answer=="y" or answer=="Y" or answer=="yes" or answer=="":
             os.system("sudo reboot")
             return
         elif answer=="n" or answer=="N" or answer=="no":
@@ -131,8 +146,22 @@ def reboot():
             continue
 
 def setEntry(path):
+    # set entry succeed:    return 1
+    # grub-reboot disable:  return 1
+    # set entry failed:     retuen 0
     global entry
-    checkDefault()
+    
+    print ""
+    if not checkDefault():
+        print bcolors.WARNING + \
+                "Please change the following setting in \etc\default\grub:" + \
+                bcolors.ENDC
+        print ""
+        print bcolors.BOLD + "GRUB_DEFAULT" + bcolors.ENDC +\
+                " = " + \
+                bcolors.OKGREEN + "saved" + bcolors.ENDC
+        return 1
+
     p_str = ""
     for i in range(0,len(path)-1):
         p_str += str(path[i])
@@ -143,9 +172,9 @@ def setEntry(path):
     
     while True:
         answer = raw_input(bcolors.BOLD + \
-                "Change the Selected Entry? [y/n]" + \
+                "Change the Selected Entry? [Y/n]" + \
                 bcolors.ENDC )
-        if answer=="y" or answer=="Y" or answer=="yes":
+        if answer=="y" or answer=="Y" or answer=="yes" or answer=="":
             os.system(cmd)
             reboot()
             print bcolors.OKGREEN + \
