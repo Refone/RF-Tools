@@ -155,7 +155,7 @@ def setEntry(path):
     if not checkDefault():
         print bcolors.WARNING + \
                 "Please change the following setting in " + bcolors.ENDC + \
-                bcolors.BOLD + "\etc\default\grub:" + \
+                bcolors.BOLD + "/etc/default/grub:" + \
                 bcolors.ENDC
         print ""
         print bcolors.BOLD + "GRUB_DEFAULT" + bcolors.ENDC +\
@@ -179,6 +179,7 @@ def setEntry(path):
                 "Change the Selected Entry? [Y/n]" + \
                 bcolors.ENDC )
         if answer=="y" or answer=="Y" or answer=="yes" or answer=="":
+            print bcolors.OKGREEN + cmd + bcolors.ENDC
             os.system(cmd)
             reboot()
             print bcolors.OKGREEN + \
