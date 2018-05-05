@@ -14,5 +14,5 @@ showtree可以以该kernel module为根节点，打印其对应的kernel module�
 #### 使用方法
 
 ```
-./showtree snd
+./showtree <module_name>
 ```
