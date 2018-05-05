@@ -1,16 +1,21 @@
 ## Grub-List
 
-#### file include:
+![](../image/grublist.png)
 
-* grub-list.py
+#### 用途:
 
-#### usage:
+* 以与grub相同可视化的界面设置下一次开机锁启动的kernel版本。
 
-execute the ```grublist.py```.
+* 可以用ssh远程调用脚本在关机前进行设置。
 
-**[↑]** **[↓]** **[←]** **[→]** can be used to select entry or back to the up one level.
+#### 使用方法:
 
-**[Enter]** is the same function with **[→]**
+```shellpower
+./grublist
+```
 
-**[q]** for quit.
-
+与grub界面相同的操作方法
+* 上下方向键选择entry
+* 回车或右方向键选择启动项或打开子目录
+* 左方向键收起子目录
+* q退出grublist
